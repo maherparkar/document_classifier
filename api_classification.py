@@ -85,7 +85,7 @@ def text_concat(json_data):
     return text
 
 
-def icr_conn(subscription_key, endpoint, image_path):
+def ocr_conn(subscription_key, endpoint, image_path):
     text_recognition_url = endpoint + ""
     image_data = open(image_path, "rb").read()
     headers = {'Ocp-Apim-Subscription-Key': subscription_key,
@@ -113,7 +113,7 @@ def icr_conn(subscription_key, endpoint, image_path):
 
 
 
-def get_icr_data(image_url):
+def get_ocr_data(image_url):
    
     image_url_changed = str(image_url).replace("?","")
     url = ""
@@ -124,7 +124,7 @@ def get_icr_data(image_url):
     response = requests.request("POST", url, headers=headers, data=payload, files=files, verify=True)
     return response.json()
 
-def get_icr_data_from_image(filepath: str,q2):
+def get_ocr_data_from_image(filepath: str,q2):
     
     image_path = filepath
     sys_date = str(datetime.datetime.now()).split(".")[0]
@@ -133,7 +133,7 @@ def get_icr_data_from_image(filepath: str,q2):
     image_url = S3CONNECTION.image_presigned_url("/" + file_name_to_save + "/" + str(image_path).split("/")[len(str(image_path).split("/")) - 1])
     print(image_url, "urls")
     #app.logger.info(str(image_url))
-    text_json = get_icr_data(image_url)
+    text_json = get_ocr_data(image_url)
     #app.logger.info(str(text_json))
     data = {
                                         "json_text": text_json
@@ -210,16 +210,16 @@ def seggregator(path, random_id):
     start = time.time()
     for i in range(1, len(os.listdir(path)) + 1):
         # try:
-        queue_variables["icr_data_" + str(i)] = queue.Queue()
+        queue_variables["ocr_data_" + str(i)] = queue.Queue()
         filepath = os.path.join(path, basename(path + str(i) + ".jpg"))
 
-        # text = get_icr_data_from_image(filepath,basename(path + str(i) + ".jpg"),queue_variables["icr_data_" + str(i)])
-        threading.Thread(target=get_icr_data_from_image,
-                         args=(filepath, queue_variables["icr_data_" + str(i)],)).start()
-    print("icr_init completed", time.time() - start)
+        # text = get_ocr_data_from_image(filepath,basename(path + str(i) + ".jpg"),queue_variables["ocr_data_" + str(i)])
+        threading.Thread(target=get_ocr_data_from_image,
+                         args=(filepath, queue_variables["ocr_data_" + str(i)],)).start()
+    print("ocr_init completed", time.time() - start)
     start = time.time()
     for i in range(1, len(os.listdir(path)) + 1):
-        result = queue_variables["icr_data_" + str(i)].get()
+        result = queue_variables["ocr_data_" + str(i)].get()
         print(result)
         text = result['json_text']
         filepath = os.path.join(path, basename(path + str(i) + ".jpg"))
@@ -227,7 +227,7 @@ def seggregator(path, random_id):
         text_json = text_concat(text)
 
         extracts[basename(filepath)] = text_json
-    print("icr get data completed", time.time() - start)
+    print("ocr get data completed", time.time() - start)
     with open('all_bill.json', 'w') as f:
         json.dump(json_datas, f)
         # f.write(str(json_datas))
@@ -245,7 +245,7 @@ def seggregator(path, random_id):
     for j in extracts:
         # nums = []
         # filepath = os.path.join(folder, str(j) + ".jpeg")
-        # text = get_icr_data_from_image(filepath)
+        # text = get_ocr_data_from_image(filepath)
         # text_json = text_concat(text)
         # print(text_json + '\n\n8989\n\n')
         print('197')
