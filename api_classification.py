@@ -86,7 +86,7 @@ def text_concat(json_data):
 
 
 def icr_conn(subscription_key, endpoint, image_path):
-    text_recognition_url = endpoint + "vision/v2.1/read/core/asyncBatchAnalyze?language=en"
+    text_recognition_url = endpoint + ""
     image_data = open(image_path, "rb").read()
     headers = {'Ocp-Apim-Subscription-Key': subscription_key,
                'Content-Type': 'application/octet-stream'}
@@ -114,15 +114,7 @@ def icr_conn(subscription_key, endpoint, image_path):
 
 
 def get_icr_data(image_url):
-    """
-    Passes the image url to IAIL cognitive services (ICR) and gets the interpreted data
-    extracted from the image in the image url and returns a json data
-    :param image_url:
-            url of the image in cloud
-    :type image_url: str
-    :return: Interpreted data
-    :rtype: dict
-    """
+   
     image_url_changed = str(image_url).replace("?","")
     url = ""
     payload={'image_url': str(image_url_changed)}
@@ -133,15 +125,7 @@ def get_icr_data(image_url):
     return response.json()
 
 def get_icr_data_from_image(filepath: str,q2):
-    """
-    Passes the image url to IAIL cognitive services (ICR) and gets the interpreted data
-    extracted from the image in the image url and returns a json data
-    :param filepath:
-            filepath of the image in local storage
-    :type filepath: str
-    :return: Interpreted data
-    :rtype: dict
-    """
+    
     image_path = filepath
     sys_date = str(datetime.datetime.now()).split(".")[0]
     file_name_to_save = sys_date.replace(":", "_").replace(" ", "")
